@@ -75,13 +75,30 @@
                 <a class="nav-link" href="/employees">Employees</a>
                 <a class="nav-link" href="/attendance">Attendance</a>
                 <a class="nav-link" href="/recognition">Recognition</a>
+                {% if current_user.is_admin() %}
+                <a class="nav-link" href="/analytics">Analytics</a>
+                {% endif %}
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle me-1"></i>{{ current_user.username }}
+                        {% if current_user.is_admin() %}
+                            <span class="badge bg-warning ms-1">Admin</span>
+                        {% endif %}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2"></i>Profile</a></li>
+                        <li><a class="dropdown-item" href="/settings"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </nav>
 
     <div class="container my-5">
         <div class="mb-4">
-            <h2 class="fw-bold mb-1">Welcome Back!</h2>
+            <h2 class="fw-bold mb-1">Welcome Back, {{ current_user.username }}!</h2>
             <p class="text-muted">Here's a summary of your team's attendance today.</p>
         </div>
 
@@ -123,10 +140,21 @@
                 <div class="card stat-card">
                     <div class="card-body">
                         <div>
-                            <h5 class="card-title text-muted fw-normal">Avg. Attendance</h5>
-                            <h2 class="text-warning">{{ summary.avg_attendance }}%</h2>
+                            <h5 class="card-title text-muted fw-normal">Late Today</h5>
+                            <h2 class="text-warning">{{ summary.late_today }}</h2>
                         </div>
-                        <i class="fas fa-chart-line text-warning"></i>
+                        <i class="fas fa-clock text-warning"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <div>
+                            <h5 class="card-title text-muted fw-normal">Avg. Attendance</h5>
+                            <h2 class="text-info">{{ summary.avg_attendance }}%</h2>
+                        </div>
+                        <i class="fas fa-chart-line text-info"></i>
                     </div>
                 </div>
             </div>

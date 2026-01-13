@@ -76,9 +76,26 @@
             <a class="navbar-brand" href="/"><i class="fas fa-user-check me-2"></i>Attendance System</a>
             <div class="navbar-nav ms-auto">
                 <a class="nav-link" href="/">Dashboard</a>
-                <a class="nav-link active" href="/employees">Employees</a>
+                <a class="nav-link" href="/employees">Employees</a>
                 <a class="nav-link" href="/attendance">Attendance</a>
                 <a class="nav-link" href="/recognition">Recognition</a>
+                {% if current_user.is_admin() %}
+                <a class="nav-link" href="/analytics">Analytics</a>
+                {% endif %}
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle me-1"></i>{{ current_user.username }}
+                        {% if current_user.is_admin() %}
+                            <span class="badge bg-warning ms-1">Admin</span>
+                        {% endif %}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2"></i>Profile</a></li>
+                        <li><a class="dropdown-item" href="/settings"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </nav>
@@ -108,34 +125,63 @@
                 <div class="card">
                     <div class="card-body p-4 p-md-5">
                         <form method="POST" enctype="multipart/form-data" id="employeeForm">
+                            {{ form.hidden_tag() }}
                             <div class="row">
                                 <div class="col-md-6">
                                     <h5 class="mb-4 fw-bold">Employee Details</h5>
                                     <div class="mb-3">
-                                        <label for="employee_id" class="form-label required-field">Employee ID</label>
-                                        <input type="text" class="form-control" id="employee_id" name="employee_id" required placeholder="e.g., EMP001">
+                                        {{ form.employee_id.label(class="form-label required-field") }}
+                                        {{ form.employee_id(class="form-control", placeholder="e.g., EMP001") }}
+                                        {% if form.employee_id.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {% for error in form.employee_id.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
                                     </div>
 
                                     <div class="mb-3">
-                                        <label for="name" class="form-label required-field">Full Name</label>
-                                        <input type="text" class="form-control" id="name" name="name" required placeholder="Enter full name">
+                                        {{ form.name.label(class="form-label required-field") }}
+                                        {{ form.name(class="form-control", placeholder="Enter full name") }}
+                                        {% if form.name.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {% for error in form.name.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
                                     </div>
 
                                     <div class="mb-3">
-                                        <label for="email" class="form-label required-field">Email</label>
-                                        <input type="email" class="form-control" id="email" name="email" required placeholder="Enter work email">
+                                        {{ form.email.label(class="form-label required-field") }}
+                                        {{ form.email(class="form-control", placeholder="Enter work email") }}
+                                        {% if form.email.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {% for error in form.email.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
                                     </div>
 
                                     <div class="mb-4">
-                                        <label for="department" class="form-label required-field">Department</label>
-                                        <input type="text" class="form-control" id="department" name="department" required placeholder="e.g., Engineering">
+                                        {{ form.department.label(class="form-label required-field") }}
+                                        {{ form.department(class="form-control", placeholder="e.g., Engineering") }}
+                                        {% if form.department.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {% for error in form.department.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
                                     </div>
                                 </div>
 
                                 <div class="col-md-6">
                                     <h5 class="mb-4 fw-bold">Profile Photo</h5>
                                      <label for="photo" class="image-uploader" id="imageUploader">
-                                        <input type="file" id="photo" name="photo" accept="image/png,image/jpeg" required>
+                                        {{ form.photo(id="photo", accept="image/png,image/jpeg", style="display: none;") }}
                                         <div id="previewPlaceholder">
                                             <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-2"></i>
                                             <p class="mb-0 text-muted">Click to upload photo</p>
@@ -143,6 +189,13 @@
                                         </div>
                                         <img id="imagePreview" src="" alt="Image Preview" style="display: none;">
                                     </label>
+                                    {% if form.photo.errors %}
+                                        <div class="text-danger small mt-2">
+                                            {% for error in form.photo.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
                             
@@ -152,9 +205,7 @@
                                 <a href="/employees" class="btn btn-light me-2">
                                     <i class="fas fa-times me-1"></i>Cancel
                                 </a>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save me-2"></i>Save Employee
-                                </button>
+                                {{ form.submit(class="btn btn-primary") }}
                             </div>
                         </form>
                     </div>

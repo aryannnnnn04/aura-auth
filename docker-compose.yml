@@ -1,0 +1,55 @@
+version: '3.9'
+
+services:
+  # Main Flask Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: face-recognition-app
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+      - ./face_vector_db:/app/face_vector_db
+      - ./mlruns:/app/mlruns
+      - ./attendance_system.db:/app/attendance_system.db
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=production
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin123}
+    restart: unless-stopped
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  # MLflow Tracking Server (Optional - for model monitoring)
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:latest
+    container_name: mlflow-server
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./mlruns:/mlflow/mlruns
+    command: mlflow server --host 0.0.0.0 --backend-store-uri sqlite:////mlflow/mlflow.db --default-artifact-root /mlflow/mlruns
+    restart: unless-stopped
+    networks:
+      - app-network
+    depends_on:
+      - app
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mlruns:
+  logs:
+  face_vector_db:
+  uploads:

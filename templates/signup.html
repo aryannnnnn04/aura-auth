@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Face Recognition Attendance System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 0;
+        }
+        
+        .signup-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 500px;
+            width: 90%;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .signup-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .signup-header h2 {
+            margin: 0;
+            font-weight: 600;
+        }
+        
+        .signup-header p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+        }
+        
+        .signup-body {
+            padding: 2rem;
+        }
+        
+        .form-floating {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-control, .form-select {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+            background-color: white;
+        }
+        
+        .btn-signup {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-signup:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .alert {
+            border-radius: 10px;
+            border: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .login-link a:hover {
+            color: #764ba2;
+        }
+        
+        .icon-input {
+            position: relative;
+        }
+        
+        .icon-input i {
+            position: absolute;
+            top: 50%;
+            left: 1rem;
+            transform: translateY(-50%);
+            color: #6c757d;
+            z-index: 10;
+        }
+        
+        .icon-input .form-control,
+        .icon-input .form-select {
+            padding-left: 3rem;
+        }
+        
+        .icon-input .form-label {
+            padding-left: 3rem;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            top: 50%;
+            right: 1rem;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #6c757d;
+            z-index: 10;
+        }
+        
+        .password-strength {
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .strength-bar {
+            height: 4px;
+            border-radius: 2px;
+            background-color: #e9ecef;
+            overflow: hidden;
+            margin-top: 0.25rem;
+        }
+        
+        .strength-fill {
+            height: 100%;
+            width: 0%;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+        
+        .strength-weak { background-color: #dc3545; }
+        .strength-medium { background-color: #ffc107; }
+        .strength-strong { background-color: #198754; }
+        
+        .invalid-feedback {
+            display: block;
+            font-size: 0.875rem;
+            color: #dc3545;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <div class="signup-header">
+            <i class="fas fa-user-plus fa-3x mb-3"></i>
+            <h2>Create Account</h2>
+            <p>Join our attendance system</p>
+        </div>
+        
+        <div class="signup-body">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show">
+                            <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' if category == 'success' else 'info-circle' }} me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <form method="POST" id="signupForm">
+                {{ form.hidden_tag() }}
+                
+                <div class="form-floating icon-input">
+                    <i class="fas fa-user"></i>
+                    {{ form.username(class="form-control", placeholder="Username") }}
+                    {{ form.username.label(class="form-label") }}
+                    {% if form.username.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.username.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-floating icon-input">
+                    <i class="fas fa-envelope"></i>
+                    {{ form.email(class="form-control", placeholder="Email") }}
+                    {{ form.email.label(class="form-label") }}
+                    {% if form.email.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.email.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-floating icon-input">
+                    <i class="fas fa-user-tag"></i>
+                    {{ form.role(class="form-select", placeholder="Role") }}
+                    {{ form.role.label(class="form-label") }}
+                    {% if form.role.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.role.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-floating icon-input">
+                    <i class="fas fa-lock"></i>
+                    {{ form.password(class="form-control", placeholder="Password", id="passwordField") }}
+                    {{ form.password.label(class="form-label") }}
+                    <i class="fas fa-eye password-toggle" id="togglePassword"></i>
+                    {% if form.password.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.password.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <div class="password-strength" id="passwordStrength" style="display: none;">
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="strengthFill"></div>
+                        </div>
+                        <small id="strengthText"></small>
+                    </div>
+                </div>
+                
+                <div class="form-floating icon-input">
+                    <i class="fas fa-lock"></i>
+                    {{ form.confirm_password(class="form-control", placeholder="Confirm Password", id="confirmPasswordField") }}
+                    {{ form.confirm_password.label(class="form-label") }}
+                    <i class="fas fa-eye password-toggle" id="toggleConfirmPassword"></i>
+                    {% if form.confirm_password.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.confirm_password.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="d-grid">
+                    {{ form.submit(class="btn btn-primary btn-signup btn-lg") }}
+                </div>
+            </form>
+            
+            <div class="login-link">
+                <p class="mb-0">Already have an account? <a href="{{ url_for('login') }}">Sign in here</a></p>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Password visibility toggles
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordField = document.getElementById('passwordField');
+        const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+        const confirmPasswordField = document.getElementById('confirmPasswordField');
+        
+        togglePassword.addEventListener('click', function() {
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+        
+        toggleConfirmPassword.addEventListener('click', function() {
+            const type = confirmPasswordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            confirmPasswordField.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+        
+        // Password strength indicator
+        const strengthElement = document.getElementById('passwordStrength');
+        const strengthFill = document.getElementById('strengthFill');
+        const strengthText = document.getElementById('strengthText');
+        
+        passwordField.addEventListener('input', function() {
+            const password = this.value;
+            const strength = calculatePasswordStrength(password);
+            
+            if (password.length > 0) {
+                strengthElement.style.display = 'block';
+                updateStrengthIndicator(strength);
+            } else {
+                strengthElement.style.display = 'none';
+            }
+        });
+        
+        function calculatePasswordStrength(password) {
+            let score = 0;
+            if (password.length >= 8) score += 1;
+            if (/[a-z]/.test(password)) score += 1;
+            if (/[A-Z]/.test(password)) score += 1;
+            if (/[0-9]/.test(password)) score += 1;
+            if (/[^A-Za-z0-9]/.test(password)) score += 1;
+            return score;
+        }
+        
+        function updateStrengthIndicator(strength) {
+            const strengthClasses = ['strength-weak', 'strength-weak', 'strength-medium', 'strength-medium', 'strength-strong'];
+            const strengthTexts = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
+            const strengthWidths = [20, 40, 60, 80, 100];
+            
+            const className = strengthClasses[strength] || 'strength-weak';
+            const text = strengthTexts[strength] || 'Very Weak';
+            const width = strengthWidths[strength] || 20;
+            
+            strengthFill.className = 'strength-fill ' + className;
+            strengthFill.style.width = width + '%';
+            strengthText.textContent = text;
+        }
+        
+        // Form validation and loading state
+        const signupForm = document.getElementById('signupForm');
+        const submitBtn = signupForm.querySelector('input[type="submit"]');
+        
+        signupForm.addEventListener('submit', function() {
+            submitBtn.disabled = true;
+            submitBtn.value = 'Creating Account...';
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating Account...';
+        });
+        
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    </script>
+</body>
+</html>
